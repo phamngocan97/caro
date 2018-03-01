@@ -161,6 +161,9 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    private void test(){
+        startActivity(new Intent(MainActivity.this,TableActivity.class));
+    }
     @Override
     protected void onDestroy() {
         mSocket.disconnect();

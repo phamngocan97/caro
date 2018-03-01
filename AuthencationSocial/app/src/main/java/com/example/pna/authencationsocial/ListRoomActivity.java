@@ -1,8 +1,10 @@
 package com.example.pna.authencationsocial;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
@@ -41,6 +43,13 @@ public class ListRoomActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mSocket.emit("create_room");
+                startActivity(new Intent(ListRoomActivity.this,TableActivity.class));
+            }
+        });
+        list_room.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mSocket.emit("come_room",arr.get(position).getName());
             }
         });
     }
@@ -54,8 +63,28 @@ public class ListRoomActivity extends AppCompatActivity {
     }
     private void onSocket(){
         mSocket.on("serverSend_list_room",recieveListRoom);
+        mSocket.on("come_room_ans",comeRoom);
     }
 
+    Emitter.Listener comeRoom = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject ob = (JSONObject) args[0];
+                    try {
+                        boolean is_success = ob.getBoolean("val");
+                        if(is_success){
+                            startActivity(new Intent(ListRoomActivity.this,TableActivity.class));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    };
     Emitter.Listener recieveListRoom = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {

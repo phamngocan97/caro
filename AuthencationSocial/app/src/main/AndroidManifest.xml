@@ -19,7 +19,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".SignUpActivity" />
-        <activity android:name=".ListRoomActivity"></activity>
+        <activity android:name=".ListRoomActivity" />
+        <activity android:name=".TableActivity"></activity>
     </application>
 
 </manifest>

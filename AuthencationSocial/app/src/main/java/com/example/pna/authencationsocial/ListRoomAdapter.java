@@ -55,6 +55,9 @@ public class ListRoomAdapter extends BaseAdapter {
             holder.txtv_name = convertView.findViewById(R.id.txtv_name);
             holder.txtv_cnt = convertView.findViewById(R.id.txtv_cnt);
             holder.img_btn_go = convertView.findViewById(R.id.imgBtnGo);
+
+
+            holder.img_btn_go.setFocusable(false);
             convertView.setTag(holder);
 
         }else{
@@ -63,7 +66,6 @@ public class ListRoomAdapter extends BaseAdapter {
 
         holder.txtv_name.setText("Phòng: "+ arr.get(position).getName());
         holder.txtv_cnt.setText("Số lượng" + arr.get(position).getCnt()+"");
-
 
         return convertView;
     }

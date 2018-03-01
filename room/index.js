@@ -21,7 +21,7 @@ io.on('connection', function (socket) {
     socket.on('create_room', function () {
         if (room_queue.length > 0) {
             var inf = room_queue[0];
-            inf.size = 0;
+            inf.size = 1;
             room_queue.shift();
             room.push(inf);
             socket.join(inf.name);
@@ -36,21 +36,23 @@ io.on('connection', function (socket) {
         }
         console.log(room.length);
         io.emit("serverSend_list_room",{list : room});
+
     });
 
     socket.on('come_room', function (_name) {
-        var index = room.find(function (item) {
-            return item['name'] == _name;
-        });
+        console.log(_name);
+        const index = room.findIndex(val => val.name == _name);
+
+        console.log(index+ " " +room[index]);
         if (index != -1 && room[index].size < 2) {
+            
             socket.emit('come_room_ans', { val: true });
             room[index].size += 1;
             socket.join(_name);
             console.log(_name + " joined");
 
             io.emit("serverSend_list_room",{list : room});
-        }
-        else {
+        }else {
             socket.emit('come_room_ans', { val: false });
             console.log(_name + " full");
         }
