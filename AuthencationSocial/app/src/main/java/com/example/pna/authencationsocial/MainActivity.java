@@ -38,10 +38,12 @@ import io.socket.emitter.Emitter;
 
 public class MainActivity extends AppCompatActivity {
     ProgressBar progressBar;
-    FirebaseAuth mAuth;
+    public static FirebaseAuth mAuth;
+    FirebaseAuth.AuthStateListener mAuthState;
+    public static String cur_room;
 
     TextView txtv_test;
-    Socket mSocket, mSocketRoom;
+    public static Socket mSocket, mSocketRoom;
 
     EditText edit_id, edit_pass;
     Button btn_signin, btn_signup;
@@ -92,14 +94,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void init() throws URISyntaxException {
         String nsp = "/namespace123";
-        String uri = "http://192.168.1.103:3000";
+        String uri = "http://192.168.1.104:3000";
 
         progressBar = findViewById(R.id.progress);
         mAuth = FirebaseAuth.getInstance();
 
-        Manager manager = new Manager(new URI
-                (uri));
-        mSocket = manager.socket(nsp);
+
+        Manager manager = new Manager(new URI(uri));
+        //mSocket = manager.socket(nsp);
+        mSocket = IO.socket(uri);
         mSocket.connect();
 
         mSocketRoom = IO.socket(uri);
@@ -168,5 +171,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         mSocket.disconnect();
         super.onDestroy();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 }

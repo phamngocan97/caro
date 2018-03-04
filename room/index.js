@@ -14,9 +14,13 @@ function room_infor(_name, _size) {
 }
 room_queue.push(new room_infor(id,1));
 
-io.on('connection', function (socket) {
+io.sockets.on('connection', function (socket) {
     console.log('connecting');
-    io.emit("serverSend_list_room",{list : room});
+    
+   // io.emit("serverSend_list_room",{list : room});
+   socket.on('get_room',function(){
+    socket.emit("serverSend_list_room",{list : room});
+   });
     
     socket.on('create_room', function () {
         if (room_queue.length > 0) {
@@ -26,6 +30,7 @@ io.on('connection', function (socket) {
             room.push(inf);
             socket.join(inf.name);
             console.log("create " + inf.name);
+            socket.emit('come_room_ans', { val: true, name : inf.name});
         }
         else {
             id++;
@@ -33,9 +38,10 @@ io.on('connection', function (socket) {
             room.push(inf);
             socket.join(inf.name);
             console.log("create " + inf.name);
+            socket.emit('come_room_ans', { val: true, name : inf.name});
         }
         console.log(room.length);
-        io.emit("serverSend_list_room",{list : room});
+        io.sockets.emit("serverSend_list_room",{list : room});
 
     });
 
@@ -43,21 +49,37 @@ io.on('connection', function (socket) {
         console.log(_name);
         const index = room.findIndex(val => val.name == _name);
 
-        console.log(index+ " " +room[index]);
+        console.log(index+ "__" +room[index]);
         if (index != -1 && room[index].size < 2) {
             
-            socket.emit('come_room_ans', { val: true });
+            socket.emit('come_room_ans', { val: true ,name : _name});
             room[index].size += 1;
             socket.join(_name);
             console.log(_name + " joined");
 
-            io.emit("serverSend_list_room",{list : room});
+            io.sockets.emit("serverSend_list_room",{list : room});
         }else {
-            socket.emit('come_room_ans', { val: false });
+            socket.emit('come_room_ans', { val: false, name : _name});
             console.log(_name + " full");
         }
 
 
     });//come room
+    socket.on("out_room",function(_name){
+        console.log("device out room");
+        const index = room.findIndex(val => val.name == _name);
+        if(index!=-1){
+            room[index].size-=1;
+            socket.leave(_name);
+            if(room[index].size==0){
+                room_queue.push(room[index]);
+                room.splice(index,1);
+            }
+            else{
+                socket.to(_name).emit("other_user_out");
+            }
+            io.sockets.emit("serverSend_list_room",{list : room});
+        }
 
+    });
 });

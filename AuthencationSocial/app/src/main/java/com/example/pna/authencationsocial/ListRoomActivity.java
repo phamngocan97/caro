@@ -8,32 +8,31 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
 public class ListRoomActivity extends AppCompatActivity {
-
-    String uri = "http://192.168.1.103:3000";
 
     ListView list_room;
     ArrayList<RowInfor> arr;
     ListRoomAdapter room_adapter;
     ImageButton btn_addRoom;
     Socket mSocket;
+    FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_room);
         init();
-        actionSocket();
+        init2();
         action();
         onSocket();
     }
@@ -42,8 +41,8 @@ public class ListRoomActivity extends AppCompatActivity {
         btn_addRoom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mSocket.emit("create_room");
-                startActivity(new Intent(ListRoomActivity.this,TableActivity.class));
+              mSocket.emit("create_room");
+              startActivity(new Intent(ListRoomActivity.this,TableActivity.class));
             }
         });
         list_room.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -53,17 +52,10 @@ public class ListRoomActivity extends AppCompatActivity {
             }
         });
     }
-    private void actionSocket(){
-        try {
-            mSocket = IO.socket(uri);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        mSocket.connect();
-    }
     private void onSocket(){
         mSocket.on("serverSend_list_room",recieveListRoom);
         mSocket.on("come_room_ans",comeRoom);
+
     }
 
     Emitter.Listener comeRoom = new Emitter.Listener() {
@@ -77,6 +69,7 @@ public class ListRoomActivity extends AppCompatActivity {
                         boolean is_success = ob.getBoolean("val");
                         if(is_success){
                             startActivity(new Intent(ListRoomActivity.this,TableActivity.class));
+                            MainActivity.cur_room = ob.getString("name");
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -115,5 +108,10 @@ public class ListRoomActivity extends AppCompatActivity {
         arr = new ArrayList<>();
         room_adapter = new ListRoomAdapter(arr,getApplicationContext(),R.layout.row_room);
         list_room.setAdapter(room_adapter);
+        mSocket = MainActivity.mSocket;
+        mAuth =MainActivity.mAuth;
+    }
+    private void init2(){
+        mSocket.emit("get_room");
     }
 }
