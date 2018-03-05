@@ -40,7 +40,7 @@ public class ListRoomAdapter extends BaseAdapter {
         return 0;
     }
 
-    class Holder{
+    private class Holder{
         TextView txtv_name,txtv_cnt;
         ImageButton img_btn_go;
     }

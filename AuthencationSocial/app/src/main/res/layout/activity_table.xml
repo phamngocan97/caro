@@ -18,11 +18,19 @@
     android:layout_height="0dp"
     android:layout_weight="3"></LinearLayout>
     <FrameLayout
+        android:background="@drawable/stroke"
         android:layout_margin="5dp"
+        android:layout_marginBottom="10dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="7"
-        android:id="@+id/table_frame">
-
+        android:id="@+id/table_frame"
+        android:padding="1dp"
+        >
+        <fragment
+            android:name="com.example.pna.authencationsocial.FragmentTable"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/table_frag"/>
     </FrameLayout>
 </LinearLayout>
