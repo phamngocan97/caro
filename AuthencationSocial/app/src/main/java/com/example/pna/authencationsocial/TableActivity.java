@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -19,7 +20,9 @@ import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
 public class TableActivity extends AppCompatActivity {
-
+    final int img1 = R.drawable.x;
+    final int img2 = R.drawable.o;
+    TextView txtv_test;
     Button btn_signout;
     FrameLayout frame;
     FragmentTable fragmentTable;
@@ -27,32 +30,94 @@ public class TableActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseAuth.AuthStateListener mAuthState;
 
-    public static int id,idTemp;
+    public static int id, idTemp;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_table);
+
+        Intent intent = getIntent();
+        Bundle bundle = intent.getBundleExtra("bundle");
+        id = bundle.getInt("id");
+
         init();
-        action();
         init2();
         actionTable();
         onSocket();
+        action();
 
     }
-    private void action(){
+
+    private void action() {
         btn_signout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mAuth.signOut();
             }
         });
-
+        if(id == 2){
+            mSocket.emit("send_turn",2,MainActivity.cur_room,-1,-1);
+        }
     }
-    private void onSocket(){
-        mSocket.on("other_user_out",other_out);
-        mSocket.on("sever_send_id",getId);
-        mSocket.on("sever_send_enough",enough);
-        mSocket.on("sever_send_turn",getTurn);
+
+
+    private void init() {
+        txtv_test = findViewById(R.id.table_txtvTest);
+        frame = findViewById(R.id.table_frame);
+        btn_signout = findViewById(R.id.btn_out);
+        mSocket = MainActivity.mSocket;
+        mAuth = MainActivity.mAuth;
+
+        fragmentTable = (FragmentTable) getFragmentManager().findFragmentById(R.id.table_frag);
+    }
+
+    private void init2() {
+        txtv_test.setText(""+id);
+
+        mAuthState = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user == null) {
+                    mSocket.emit("out_room", MainActivity.cur_room);
+                    Toast.makeText(TableActivity.this, MainActivity.cur_room, Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(TableActivity.this, MainActivity.class));
+                }
+            }
+        };
+        mAuth.addAuthStateListener(mAuthState);
+    }
+
+    private void actionTable() {
+        fragmentTable.setEnable(false);
+        for (int i = 0; i < fragmentTable.n; i++) {
+            for (int j = 0; j < fragmentTable.n; j++) {
+                final int ii = i, jj = j;
+                fragmentTable.holder[ii][jj].img.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (fragmentTable.mark[ii][jj] == 0) {
+                            fragmentTable.mark[ii][jj] = id;
+                            if (id == 1) {
+                                fragmentTable.holder[ii][jj].img.setImageResource(R.drawable.x);
+                            } else {
+                                fragmentTable.holder[ii][jj].img.setImageResource(R.drawable.o);
+                            }
+
+                            fragmentTable.setEnable(false);
+                            mSocket.emit("send_turn", idTemp, MainActivity.cur_room, ii, jj);
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    private void onSocket() {
+        mSocket.on("other_user_out", other_out);
+
+        mSocket.on("sever_send_turn", getTurn);
     }
 
     Emitter.Listener getTurn = new Emitter.Listener() {
@@ -63,11 +128,21 @@ public class TableActivity extends AppCompatActivity {
                 public void run() {
                     JSONObject ob = (JSONObject) args[0];
                     try {
-                        idTemp =  ob.getInt("val");
-                        if(idTemp!=id){
-                            fragmentTable.table.setEnabled(false);
-                        }else{
-                            fragmentTable.table.setEnabled(true);
+                        idTemp = ob.getInt("val");
+                        int x, y, idPrev;
+                        x = ob.getInt("x");
+                        y = ob.getInt("y");
+                        idPrev = idTemp == 1 ? 2 : 1;
+                        if (x != -1 && y != -1) {
+                            fragmentTable.mark[x][y] = idPrev;
+                            if (idPrev == 1) fragmentTable.holder[x][y].img.setImageResource(img1);
+                            else fragmentTable.holder[x][y].img.setImageResource(img2);
+                        }
+
+                        if (idTemp != id) {
+                            fragmentTable.setEnable(false);
+                        } else {
+                            fragmentTable.setEnable(true);
                         }
 
                     } catch (JSONException e) {
@@ -77,88 +152,18 @@ public class TableActivity extends AppCompatActivity {
             });
         }
     };
-    Emitter.Listener enough = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mSocket.emit("send_turn",2,MainActivity.cur_room);
-                }
-            });
-        }
-    };
-    Emitter.Listener getId = new Emitter.Listener() {
-        @Override
-        public void call(final Object... args) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    JSONObject ob = (JSONObject) args[0];
-                    try {
-                        id = ob.getInt("id");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-        }
-    };
+
     Emitter.Listener other_out = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(TableActivity.this,"Doi thu thoat, ban thang",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TableActivity.this, "Doi thu thoat, ban thang", Toast.LENGTH_SHORT).show();
                 }
             });
         }
     };
 
 
-    private void init(){
-        frame = findViewById(R.id.table_frame);
-        btn_signout = findViewById(R.id.btn_out);
-        mSocket = MainActivity.mSocket;
-        mAuth = MainActivity.mAuth;
-
-        fragmentTable = (FragmentTable) getFragmentManager().findFragmentById(R.id.table_frag);
-    }
-    private void init2(){
-
-
-        mAuthState = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if(user==null){
-                    mSocket.emit("out_room",MainActivity.cur_room);
-                    Toast.makeText(TableActivity.this,MainActivity.cur_room,Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(TableActivity.this,MainActivity.class));
-                }
-            }
-        };
-        mAuth.addAuthStateListener(mAuthState);
-    }
-    private void actionTable(){
-        for(int i =0;i<fragmentTable.n;i++){
-            for(int j=0;j<fragmentTable.n;j++){
-                final int ii=i,jj=j;
-                fragmentTable.holder[ii][jj].img.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if(fragmentTable.mark[ii][jj]==0){
-                            fragmentTable.mark[ii][jj]=id;
-                            if(id==1){
-                                fragmentTable.holder[ii][jj].img.setImageResource(R.drawable.x);
-                            }else{
-                                fragmentTable.holder[ii][jj].img.setImageResource(R.drawable.o);
-                            }
-                        }
-                    }
-                });
-            }
-        }
-    }
 }

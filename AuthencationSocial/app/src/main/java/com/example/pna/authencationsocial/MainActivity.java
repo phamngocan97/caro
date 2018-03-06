@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void init() throws URISyntaxException {
         String nsp = "/namespace123";
-        String uri = "http://192.168.1.104:3000";
+        String uri = "http://192.168.1.104:4000";
 
         progressBar = findViewById(R.id.progress);
         mAuth = FirebaseAuth.getInstance();

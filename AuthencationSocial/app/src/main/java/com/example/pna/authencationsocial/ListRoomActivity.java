@@ -42,7 +42,7 @@ public class ListRoomActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
               mSocket.emit("create_room");
-              startActivity(new Intent(ListRoomActivity.this,TableActivity.class));
+
             }
         });
         list_room.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -53,9 +53,8 @@ public class ListRoomActivity extends AppCompatActivity {
         });
     }
     private void onSocket(){
-        mSocket.on("serverSend_list_room",recieveListRoom);
         mSocket.on("come_room_ans",comeRoom);
-
+        mSocket.on("serverSend_list_room",recieveListRoom);
     }
 
     Emitter.Listener comeRoom = new Emitter.Listener() {
@@ -67,9 +66,16 @@ public class ListRoomActivity extends AppCompatActivity {
                     JSONObject ob = (JSONObject) args[0];
                     try {
                         boolean is_success = ob.getBoolean("val");
+
                         if(is_success){
-                            startActivity(new Intent(ListRoomActivity.this,TableActivity.class));
+                            int id = ob.getInt("id");
                             MainActivity.cur_room = ob.getString("name");
+                            Intent intent = new Intent(ListRoomActivity.this,TableActivity.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putInt("id",id);
+                            intent.putExtra("bundle",bundle);
+                            startActivity(intent);
+
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();

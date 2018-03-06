@@ -102,6 +102,13 @@ public class FragmentTable extends Fragment{
         }
     }
 
+    public void setEnable(boolean val){
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                holder[i][j].img.setEnabled(val);
+            }
+        }
+    }
     public boolean test(int x, int y, int k) {
         int col = y, row = x;
         int doc, ngang, cc, cp;
