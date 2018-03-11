@@ -41,7 +41,7 @@ io.sockets.on("connection", function (socket) {
             socket.emit("come_room_ans", { val: true, name: inf.name, id: 1 });
         }
         io.sockets.emit("serverSend_list_room", { list: room });
-        
+
 
     });
 
@@ -51,18 +51,14 @@ io.sockets.on("connection", function (socket) {
 
         if (index != -1 && room[index].size < 2) {
 
-            socket.emit("come_room_ans", { val: true, name: _name ,id:2});
             room[index].size += 1;
             socket.join(_name);
             console.log(_name + " joined");
 
+            socket.emit("come_room_ans", { val: true, name: _name, id: 2 });
             io.sockets.emit("serverSend_list_room", { list: room });
-            socket.emit("sever_send_id", { id: 2 });
-
-            socket.to(_name).emit("sever_send_turn", { id: 1, x: -1, y: -1 });
-            console.log("sended first turn ");
         } else {
-            socket.emit("come_room_ans", { val: false, name: _name,id:-1 });
+            socket.emit("come_room_ans", { val: false, name: _name, id: -1 });
             console.log(_name + " full");
         }
 
@@ -71,14 +67,27 @@ io.sockets.on("connection", function (socket) {
 
     socket.on("send_turn", function (turn, _name, _x, _y) {
         if (turn == 1) {
-            socket.to(_name).emit("sever_send_turn", { val: 2, x: _x, y: _y });
-            console.log("sended turn " + 2);
+            io.sockets.in(_name).emit("sever_send_turn", { val: 2, x: _x, y: _y });
+            console.log("sent turn " + 2);
         } else {
-            socket.to(_name).emit("sever_send_turn", { val: 1, x: _x, y: _y });
-            console.log("sended turn " + 1);
+            io.sockets.in(_name).emit("sever_send_turn", { val: 1, x: _x, y: _y });
+            console.log("sent turn " + 1);
         }
     });
 
+    socket.on("clientSend_ready", function (_name, id, isReady) {
+        socket.broadcast.to(_name).emit("serverSend_state", { val: isReady });
+        console.log(id + " ready");
+    });
+
+    socket.on("clientSend_enough", function (_name) {
+        const index = room.findIndex(val => val.name == _name);
+        if (index != -1) {
+            io.sockets.in(_name).emit("sever_send_enough", { valo: 1 });
+            console.log("sent ennough " + _name);
+            console.log("size: " + io.nsps['/'].adapter.rooms[_name].length);
+        }
+    });
 
     socket.on("out_room", function (_name) {
         console.log("device out room");
@@ -92,7 +101,7 @@ io.sockets.on("connection", function (socket) {
             }
             else {
                 socket.to(_name).emit("other_user_out");
-                socket.to(_name).emit("sever_send_id", { id: 1 });
+                //socket.to(_name).emit("sever_send_id", { id: 1 });
             }
             io.sockets.emit("serverSend_list_room", { list: room });
         }

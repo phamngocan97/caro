@@ -22,8 +22,9 @@ import io.socket.emitter.Emitter;
 public class TableActivity extends AppCompatActivity {
     final int img1 = R.drawable.x;
     final int img2 = R.drawable.o;
+
     TextView txtv_test;
-    Button btn_signout;
+    Button btn_signout,btn_ready;
     FrameLayout frame;
     FragmentTable fragmentTable;
     Socket mSocket;
@@ -31,7 +32,8 @@ public class TableActivity extends AppCompatActivity {
     FirebaseAuth.AuthStateListener mAuthState;
 
     public static int id, idTemp;
-
+    boolean isReady = false;
+    int isEnough = -1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,8 +58,15 @@ public class TableActivity extends AppCompatActivity {
                 mAuth.signOut();
             }
         });
+        btn_ready.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isReady=!isReady;
+                mSocket.emit("clientSend_ready",MainActivity.cur_room,id,isReady);
+            }
+        });
         if(id == 2){
-            mSocket.emit("send_turn",2,MainActivity.cur_room,-1,-1);
+            mSocket.emit("clientSend_enough",MainActivity.cur_room);
         }
     }
 
@@ -66,6 +75,8 @@ public class TableActivity extends AppCompatActivity {
         txtv_test = findViewById(R.id.table_txtvTest);
         frame = findViewById(R.id.table_frame);
         btn_signout = findViewById(R.id.btn_out);
+        btn_ready = findViewById(R.id.table_btnReady);
+
         mSocket = MainActivity.mSocket;
         mAuth = MainActivity.mAuth;
 
@@ -105,6 +116,7 @@ public class TableActivity extends AppCompatActivity {
                                 fragmentTable.holder[ii][jj].img.setImageResource(R.drawable.o);
                             }
 
+
                             fragmentTable.setEnable(false);
                             mSocket.emit("send_turn", idTemp, MainActivity.cur_room, ii, jj);
                         }
@@ -116,7 +128,8 @@ public class TableActivity extends AppCompatActivity {
 
     private void onSocket() {
         mSocket.on("other_user_out", other_out);
-
+        mSocket.on("serverSend_state",getState);
+        mSocket.on("sever_send_enough",getEnough);
         mSocket.on("sever_send_turn", getTurn);
     }
 
@@ -128,7 +141,11 @@ public class TableActivity extends AppCompatActivity {
                 public void run() {
                     JSONObject ob = (JSONObject) args[0];
                     try {
+
                         idTemp = ob.getInt("val");
+
+//                        txtv_test.setText(idTemp);
+
                         int x, y, idPrev;
                         x = ob.getInt("x");
                         y = ob.getInt("y");
@@ -153,6 +170,47 @@ public class TableActivity extends AppCompatActivity {
         }
     };
 
+    Emitter.Listener getEnough = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject ob = (JSONObject) args[0];
+                    try {
+                        isEnough = ob.getInt("valo");
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+
+        }
+    };
+    Emitter.Listener getState = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject ob = (JSONObject) args[0];
+                    try {
+                        boolean val = ob.getBoolean("val");
+                        txtv_test.setText(isReady+" "+val +" " +isEnough);
+                        if(val && isReady && isEnough == 1){
+                            mSocket.emit("send_turn",2,MainActivity.cur_room,-1,-1);
+                            Toast.makeText(TableActivity.this,"send ok",Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    };
+
     Emitter.Listener other_out = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
@@ -160,6 +218,7 @@ public class TableActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     Toast.makeText(TableActivity.this, "Doi thu thoat, ban thang", Toast.LENGTH_SHORT).show();
+                    id = 1;
                 }
             });
         }

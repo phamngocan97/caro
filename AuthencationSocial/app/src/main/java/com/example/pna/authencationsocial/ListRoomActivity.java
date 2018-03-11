@@ -71,9 +71,11 @@ public class ListRoomActivity extends AppCompatActivity {
                             int id = ob.getInt("id");
                             MainActivity.cur_room = ob.getString("name");
                             Intent intent = new Intent(ListRoomActivity.this,TableActivity.class);
+
                             Bundle bundle = new Bundle();
                             bundle.putInt("id",id);
                             intent.putExtra("bundle",bundle);
+
                             startActivity(intent);
 
                         }
