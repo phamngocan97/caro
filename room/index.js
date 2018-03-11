@@ -89,6 +89,10 @@ io.sockets.on("connection", function (socket) {
         }
     });
 
+    socket.on("client_winner",function(_name,_id){
+        io.sockets.in(_name).emit("serverSend_winner",{id : _id});
+    });
+
     socket.on("out_room", function (_name) {
         console.log("device out room");
         const index = room.findIndex(val => val.name == _name);
@@ -101,6 +105,7 @@ io.sockets.on("connection", function (socket) {
             }
             else {
                 socket.to(_name).emit("other_user_out");
+                io.sockets.in(_name).emit("sever_send_enough", { valo: -1 });
                 //socket.to(_name).emit("sever_send_id", { id: 1 });
             }
             io.sockets.emit("serverSend_list_room", { list: room });

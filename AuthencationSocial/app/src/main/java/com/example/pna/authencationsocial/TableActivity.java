@@ -1,8 +1,10 @@
 package com.example.pna.authencationsocial;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -116,9 +118,12 @@ public class TableActivity extends AppCompatActivity {
                                 fragmentTable.holder[ii][jj].img.setImageResource(R.drawable.o);
                             }
 
-
                             fragmentTable.setEnable(false);
-                            mSocket.emit("send_turn", idTemp, MainActivity.cur_room, ii, jj);
+                            if(fragmentTable.test(ii,jj,id)){
+                                mSocket.emit("client_winner",MainActivity.cur_room,id);
+                            }else {
+                                mSocket.emit("send_turn", idTemp, MainActivity.cur_room, ii, jj);
+                            }
                         }
                     }
                 });
@@ -131,7 +136,39 @@ public class TableActivity extends AppCompatActivity {
         mSocket.on("serverSend_state",getState);
         mSocket.on("sever_send_enough",getEnough);
         mSocket.on("sever_send_turn", getTurn);
+        mSocket.on("serverSend_winner",getWinner);
     }
+
+    Emitter.Listener getWinner = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject ob = (JSONObject) args[0];
+                    try {
+                        int t = ob.getInt("id");
+                        AlertDialog.Builder alert =new AlertDialog.Builder(TableActivity.this);
+                        alert.setCancelable(false);
+                        if(t == id){
+                            alert.setMessage("Win");
+                        }else{
+                            alert.setMessage("Lose");
+                        }
+                        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                fragmentTable.reset();
+                            }
+                        });
+                        alert.show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    };
 
     Emitter.Listener getTurn = new Emitter.Listener() {
         @Override
@@ -201,6 +238,7 @@ public class TableActivity extends AppCompatActivity {
                         txtv_test.setText(isReady+" "+val +" " +isEnough);
                         if(val && isReady && isEnough == 1){
                             mSocket.emit("send_turn",2,MainActivity.cur_room,-1,-1);
+                            isReady = false;
                             Toast.makeText(TableActivity.this,"send ok",Toast.LENGTH_SHORT).show();
                         }
                     } catch (JSONException e) {
@@ -218,6 +256,17 @@ public class TableActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     Toast.makeText(TableActivity.this, "Doi thu thoat, ban thang", Toast.LENGTH_SHORT).show();
+                    AlertDialog.Builder alert =new AlertDialog.Builder(TableActivity.this);
+                    alert.setCancelable(false);
+                    alert.setMessage("Doi thu thoat, ban thang");
+                    alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            fragmentTable.reset();
+                        }
+                    });
+                    alert.show();
+                    fragmentTable.setEnable(false);
                     id = 1;
                 }
             });
