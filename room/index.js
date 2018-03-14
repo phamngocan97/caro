@@ -16,7 +16,7 @@ room_queue.push(new room_infor(id, 1));
 
 io.sockets.on("connection", function (socket) {
     console.log("connecting");
-
+    socket.un = -1;
     // io.emit("serverSend_list_room",{list : room});
     socket.on("get_room", function () {
         socket.emit("serverSend_list_room", { list: room });
@@ -31,6 +31,8 @@ io.sockets.on("connection", function (socket) {
             socket.join(inf.name);
             console.log("create " + inf.name);
             socket.emit("come_room_ans", { val: true, name: inf.name, id: 1 });
+
+            socket.un = inf.name;
         }
         else {
             id++;
@@ -39,7 +41,11 @@ io.sockets.on("connection", function (socket) {
             socket.join(inf.name);
             console.log("create " + inf.name);
             socket.emit("come_room_ans", { val: true, name: inf.name, id: 1 });
+
+            socket.un = id;
         }
+
+
         io.sockets.emit("serverSend_list_room", { list: room });
 
 
@@ -57,6 +63,8 @@ io.sockets.on("connection", function (socket) {
 
             socket.emit("come_room_ans", { val: true, name: _name, id: 2 });
             io.sockets.emit("serverSend_list_room", { list: room });
+
+            socket.un = _name;
         } else {
             socket.emit("come_room_ans", { val: false, name: _name, id: -1 });
             console.log(_name + " full");
@@ -88,6 +96,9 @@ io.sockets.on("connection", function (socket) {
             console.log("size: " + io.nsps['/'].adapter.rooms[_name].length);
         }
     });
+    socket.on("clientSend_playing",function(_name){
+        io.sockets.in(_name).emit("severSend_playing");
+    });
 
     socket.on("client_winner",function(_name,_id){
         io.sockets.in(_name).emit("serverSend_winner",{id : _id});
@@ -110,6 +121,27 @@ io.sockets.on("connection", function (socket) {
             }
             io.sockets.emit("serverSend_list_room", { list: room });
         }
+        socket.un = -1;
 
     });
-});
+    socket.on("disconnect",function(){
+        console.log("device is disconnected " + socket.un);
+        if(socket.un != -1){
+            const index = room.findIndex(val => val.name == socket.un);
+            console.log("index: " + index);
+            
+            room[index].size -= 1;
+            socket.leave(socket.un);
+            if (room[index].size == 0) {
+                room_queue.push(room[index]);
+                room.splice(index, 1);
+            }
+            else {
+                socket.to(socket.un).emit("other_user_out");
+                io.sockets.in(socket.un).emit("sever_send_enough", { valo: -1 });
+                //socket.to(_name).emit("sever_send_id", { id: 1 });
+            }
+            io.sockets.emit("serverSend_list_room", { list: room });
+        }
+    });
+});                                                                                                                                                                                                                                                                                 

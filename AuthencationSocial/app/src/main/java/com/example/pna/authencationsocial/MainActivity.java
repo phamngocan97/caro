@@ -57,36 +57,9 @@ public class MainActivity extends AppCompatActivity {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        actionVolley();
+
         actionSocket();
     }
-
-    private void actionVolley() {
-        String url = "https://andt-testphp.herokuapp.com/test.php";
-        RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                    }
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> hm = new HashMap<>();
-                hm.put("post", "4444342");
-                return hm;
-            }
-        };
-        requestQueue.add(stringRequest);
-    }
-
     private void actionSocket() {
         mSocketRoom.on("connectToRoom", listenerRoom);
         mSocket.on("connectToRoom", listenerRoom);
@@ -164,9 +137,6 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void test(){
-        startActivity(new Intent(MainActivity.this,TableActivity.class));
-    }
     @Override
     protected void onDestroy() {
         mSocket.disconnect();

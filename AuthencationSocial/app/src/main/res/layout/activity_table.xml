@@ -17,6 +17,7 @@
             android:layout_height="match_parent"
             android:id="@+id/btn_out"/>
         <Button
+            android:background="@drawable/ready_unpress"
             android:text="Ready"
             android:layout_centerHorizontal="true"
             android:layout_width="wrap_content"

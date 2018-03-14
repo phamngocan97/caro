@@ -35,6 +35,7 @@ public class TableActivity extends AppCompatActivity {
 
     public static int id, idTemp;
     boolean isReady = false;
+    boolean isPlaying = false;
     int isEnough = -1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +65,8 @@ public class TableActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 isReady=!isReady;
+                if(isReady) btn_ready.setBackgroundResource(R.drawable.ready_press);
+                if(!isReady) btn_ready.setBackgroundResource(R.drawable.ready_unpress);
                 mSocket.emit("clientSend_ready",MainActivity.cur_room,id,isReady);
             }
         });
@@ -135,6 +138,7 @@ public class TableActivity extends AppCompatActivity {
         mSocket.on("other_user_out", other_out);
         mSocket.on("serverSend_state",getState);
         mSocket.on("sever_send_enough",getEnough);
+        mSocket.on("severSend_playing",getPlaying);
         mSocket.on("sever_send_turn", getTurn);
         mSocket.on("serverSend_winner",getWinner);
     }
@@ -161,7 +165,9 @@ public class TableActivity extends AppCompatActivity {
                                 fragmentTable.reset();
                             }
                         });
+                        btn_ready.setVisibility(View.VISIBLE);
                         alert.show();
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -238,7 +244,9 @@ public class TableActivity extends AppCompatActivity {
                         txtv_test.setText(isReady+" "+val +" " +isEnough);
                         if(val && isReady && isEnough == 1){
                             mSocket.emit("send_turn",2,MainActivity.cur_room,-1,-1);
-                            isReady = false;
+                            mSocket.emit("clientSend_playing",MainActivity.cur_room);
+
+
                             Toast.makeText(TableActivity.this,"send ok",Toast.LENGTH_SHORT).show();
                         }
                     } catch (JSONException e) {
@@ -249,24 +257,42 @@ public class TableActivity extends AppCompatActivity {
         }
     };
 
+    Emitter.Listener getPlaying = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    btn_ready.setBackgroundResource(R.drawable.ready_unpress);
+                    btn_ready.setVisibility(View.GONE);
+                    isPlaying = true;
+                    isReady=false;
+                }
+            });
+        }
+    };
     Emitter.Listener other_out = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(TableActivity.this, "Doi thu thoat, ban thang", Toast.LENGTH_SHORT).show();
-                    AlertDialog.Builder alert =new AlertDialog.Builder(TableActivity.this);
-                    alert.setCancelable(false);
-                    alert.setMessage("Doi thu thoat, ban thang");
-                    alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            fragmentTable.reset();
-                        }
-                    });
-                    alert.show();
-                    fragmentTable.setEnable(false);
+                    if(isPlaying) {
+                        Toast.makeText(TableActivity.this, "Doi thu thoat, ban thang", Toast.LENGTH_SHORT).show();
+                        AlertDialog.Builder alert = new AlertDialog.Builder(TableActivity.this);
+                        alert.setCancelable(false);
+                        alert.setMessage("Doi thu thoat, ban thang");
+                        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                fragmentTable.reset();
+                            }
+                        });
+                        alert.show();
+                        fragmentTable.setEnable(false);
+                    }
+                    btn_ready.setVisibility(View.VISIBLE);
+                    isEnough=-1;
                     id = 1;
                 }
             });
