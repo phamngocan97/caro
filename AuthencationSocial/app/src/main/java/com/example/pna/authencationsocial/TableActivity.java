@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,7 +27,8 @@ public class TableActivity extends AppCompatActivity {
     final int img2 = R.drawable.o;
 
     TextView txtv_test;
-    Button btn_signout,btn_ready;
+    Button btn_ready;
+    ImageButton btn_signout,btn_prev;
     FrameLayout frame;
     FragmentTable fragmentTable;
     Socket mSocket;
@@ -73,6 +75,14 @@ public class TableActivity extends AppCompatActivity {
         if(id == 2){
             mSocket.emit("clientSend_enough",MainActivity.cur_room);
         }
+        btn_prev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSocket.emit("out_room", MainActivity.cur_room);
+                MainActivity.cur_room = "-1";
+                startActivity(new Intent(TableActivity.this,ListRoomActivity.class));
+            }
+        });
     }
 
 
@@ -80,6 +90,7 @@ public class TableActivity extends AppCompatActivity {
         txtv_test = findViewById(R.id.table_txtvTest);
         frame = findViewById(R.id.table_frame);
         btn_signout = findViewById(R.id.btn_out);
+        btn_prev = findViewById(R.id.btn_prev);
         btn_ready = findViewById(R.id.table_btnReady);
 
         mSocket = MainActivity.mSocket;
@@ -97,6 +108,7 @@ public class TableActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user == null) {
                     mSocket.emit("out_room", MainActivity.cur_room);
+                    MainActivity.cur_room = "-1";
                     Toast.makeText(TableActivity.this, MainActivity.cur_room, Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(TableActivity.this, MainActivity.class));
                 }

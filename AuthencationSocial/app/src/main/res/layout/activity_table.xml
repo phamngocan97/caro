@@ -7,22 +7,37 @@
     tools:context="com.example.pna.authencationsocial.TableActivity"
     android:orientation="vertical"
     android:weightSum="10">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
-        <Button
-            android:text="sign out"
+
+        <ImageButton
+            android:src="@drawable/previous"
+            android:scaleType="fitXY"
+            android:background="@null"
+            android:id="@+id/btn_prev"
             android:layout_width="100dp"
             android:layout_height="match_parent"
-            android:id="@+id/btn_out"/>
+            android:text="sign out" />
+
         <Button
-            android:background="@drawable/ready_unpress"
-            android:text="Ready"
-            android:layout_centerHorizontal="true"
+            android:id="@+id/table_btnReady"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:id="@+id/table_btnReady"/>
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/ready_unpress"
+            android:text="Ready" />
+
+        <ImageButton
+            android:src="@drawable/turnoff"
+            android:scaleType="fitXY"
+            android:background="@null"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:id="@+id/btn_out"/>
 
     </RelativeLayout>
 
