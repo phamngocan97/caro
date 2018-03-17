@@ -14,6 +14,9 @@ function room_infor(_name, _size) {
 }
 room_queue.push(new room_infor(id, 1));
 
+
+
+
 io.sockets.on("connection", function (socket) {
     console.log("connecting");
     socket.un = -1;
@@ -74,13 +77,15 @@ io.sockets.on("connection", function (socket) {
     });//come room
 
     socket.on("send_turn", function (turn, _name, _x, _y) {
-        if (turn == 1) {
-            io.sockets.in(_name).emit("sever_send_turn", { val: 2, x: _x, y: _y });
-            console.log("sent turn " + 2);
-        } else {
-            io.sockets.in(_name).emit("sever_send_turn", { val: 1, x: _x, y: _y });
-            console.log("sent turn " + 1);
-        }
+        io.sockets.in(_name).emit("sever_send_turn", { val: turn, x: _x, y: _y });
+        console.log("sent turn " + turn);
+        // if (turn == 1) {
+        //     io.sockets.in(_name).emit("sever_send_turn", { val: 2, x: _x, y: _y });
+        //     console.log("sent turn " + 2);
+        // } else {
+        //     io.sockets.in(_name).emit("sever_send_turn", { val: 1, x: _x, y: _y });
+        //     console.log("sent turn " + 1);
+        // }
     });
 
     socket.on("clientSend_ready", function (_name, id, isReady) {

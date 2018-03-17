@@ -28,17 +28,19 @@ public class TableActivity extends AppCompatActivity {
 
     TextView txtv_test;
     Button btn_ready;
-    ImageButton btn_signout,btn_prev;
+    ImageButton btn_signout, btn_prev;
     FrameLayout frame;
     FragmentTable fragmentTable;
     Socket mSocket;
     FirebaseAuth mAuth;
     FirebaseAuth.AuthStateListener mAuthState;
 
-    public static int id, idTemp;
+    public static int id, idTemp = -1;
+    int k = 0;
     boolean isReady = false;
     boolean isPlaying = false;
     int isEnough = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,21 +68,21 @@ public class TableActivity extends AppCompatActivity {
         btn_ready.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isReady=!isReady;
-                if(isReady) btn_ready.setBackgroundResource(R.drawable.ready_press);
-                if(!isReady) btn_ready.setBackgroundResource(R.drawable.ready_unpress);
-                mSocket.emit("clientSend_ready",MainActivity.cur_room,id,isReady);
+                isReady = !isReady;
+                if (isReady) btn_ready.setBackgroundResource(R.drawable.ready_press);
+                if (!isReady) btn_ready.setBackgroundResource(R.drawable.ready_unpress);
+                mSocket.emit("clientSend_ready", MainActivity.cur_room, id, isReady);
             }
         });
-        if(id == 2){
-            mSocket.emit("clientSend_enough",MainActivity.cur_room);
+        if (id == 2) {
+            mSocket.emit("clientSend_enough", MainActivity.cur_room);
         }
         btn_prev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mSocket.emit("out_room", MainActivity.cur_room);
                 MainActivity.cur_room = "-1";
-                startActivity(new Intent(TableActivity.this,ListRoomActivity.class));
+                startActivity(new Intent(TableActivity.this, ListRoomActivity.class));
             }
         });
     }
@@ -100,7 +102,7 @@ public class TableActivity extends AppCompatActivity {
     }
 
     private void init2() {
-        txtv_test.setText(""+id);
+        txtv_test.setText("" + id);
 
         mAuthState = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -125,20 +127,25 @@ public class TableActivity extends AppCompatActivity {
                 fragmentTable.holder[ii][jj].img.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (fragmentTable.mark[ii][jj] == 0) {
+                        if (fragmentTable.mark[ii][jj] == 0 && idTemp == id) {
                             fragmentTable.mark[ii][jj] = id;
                             if (id == 1) {
                                 fragmentTable.holder[ii][jj].img.setImageResource(R.drawable.x);
                             } else {
                                 fragmentTable.holder[ii][jj].img.setImageResource(R.drawable.o);
                             }
-
-                            fragmentTable.setEnable(false);
-                            if(fragmentTable.test(ii,jj,id)){
-                                mSocket.emit("client_winner",MainActivity.cur_room,id);
-                            }else {
-                                mSocket.emit("send_turn", idTemp, MainActivity.cur_room, ii, jj);
+                            //Toast.makeText(TableActivity.this,"k: " + k,Toast.LENGTH_SHORT).show();
+                            //k++;
+                            //fragmentTable.setEnable(false);
+                            idTemp = -1;
+                            if (fragmentTable.test(ii, jj, id)) {
+                                mSocket.emit("client_winner", MainActivity.cur_room, id);
+                            } else {
+                                int val_send;
+                                val_send = id == 1 ? 2 : 1;
+                                mSocket.emit("send_turn", val_send, MainActivity.cur_room, ii, jj);
                             }
+
                         }
                     }
                 });
@@ -148,11 +155,11 @@ public class TableActivity extends AppCompatActivity {
 
     private void onSocket() {
         mSocket.on("other_user_out", other_out);
-        mSocket.on("serverSend_state",getState);
-        mSocket.on("sever_send_enough",getEnough);
-        mSocket.on("severSend_playing",getPlaying);
+        mSocket.on("serverSend_state", getState);
+        mSocket.on("sever_send_enough", getEnough);
+        mSocket.on("severSend_playing", getPlaying);
         mSocket.on("sever_send_turn", getTurn);
-        mSocket.on("serverSend_winner",getWinner);
+        mSocket.on("serverSend_winner", getWinner);
     }
 
     Emitter.Listener getWinner = new Emitter.Listener() {
@@ -164,11 +171,11 @@ public class TableActivity extends AppCompatActivity {
                     JSONObject ob = (JSONObject) args[0];
                     try {
                         int t = ob.getInt("id");
-                        AlertDialog.Builder alert =new AlertDialog.Builder(TableActivity.this);
+                        AlertDialog.Builder alert = new AlertDialog.Builder(TableActivity.this);
                         alert.setCancelable(false);
-                        if(t == id){
+                        if (t == id) {
                             alert.setMessage("Win");
-                        }else{
+                        } else {
                             alert.setMessage("Lose");
                         }
                         alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -198,6 +205,7 @@ public class TableActivity extends AppCompatActivity {
                     try {
 
                         idTemp = ob.getInt("val");
+           //             Toast.makeText(TableActivity.this, "id temp: " + idTemp, Toast.LENGTH_SHORT).show();
 
 //                        txtv_test.setText(idTemp);
 
@@ -253,13 +261,11 @@ public class TableActivity extends AppCompatActivity {
                     JSONObject ob = (JSONObject) args[0];
                     try {
                         boolean val = ob.getBoolean("val");
-                        txtv_test.setText(isReady+" "+val +" " +isEnough);
-                        if(val && isReady && isEnough == 1){
-                            mSocket.emit("send_turn",2,MainActivity.cur_room,-1,-1);
-                            mSocket.emit("clientSend_playing",MainActivity.cur_room);
+                        txtv_test.setText(isReady + " " + val + " " + isEnough);
+                        if (val && isReady && isEnough == 1) {
+                            mSocket.emit("send_turn", 1, MainActivity.cur_room, -1, -1);
+                            mSocket.emit("clientSend_playing", MainActivity.cur_room);
 
-
-                            Toast.makeText(TableActivity.this,"send ok",Toast.LENGTH_SHORT).show();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -278,7 +284,7 @@ public class TableActivity extends AppCompatActivity {
                     btn_ready.setBackgroundResource(R.drawable.ready_unpress);
                     btn_ready.setVisibility(View.GONE);
                     isPlaying = true;
-                    isReady=false;
+                    isReady = false;
                 }
             });
         }
@@ -289,7 +295,7 @@ public class TableActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if(isPlaying) {
+                    if (isPlaying) {
                         Toast.makeText(TableActivity.this, "Doi thu thoat, ban thang", Toast.LENGTH_SHORT).show();
                         AlertDialog.Builder alert = new AlertDialog.Builder(TableActivity.this);
                         alert.setCancelable(false);
@@ -301,10 +307,11 @@ public class TableActivity extends AppCompatActivity {
                             }
                         });
                         alert.show();
+                        idTemp = -1;
                         fragmentTable.setEnable(false);
                     }
                     btn_ready.setVisibility(View.VISIBLE);
-                    isEnough=-1;
+                    isEnough = -1;
                     id = 1;
                 }
             });
