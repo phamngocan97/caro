@@ -18,6 +18,7 @@
         <TextView
             android:text="Ten phong"
             android:textSize="15sp"
+            android:textColor="#0a0909"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="5"
@@ -28,6 +29,7 @@
         <TextView
             android:text="so nguoi: "
             android:textSize="15dp"
+            android:textColor="#0a0909"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="5"

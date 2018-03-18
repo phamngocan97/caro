@@ -103,7 +103,7 @@ public class TableActivity extends AppCompatActivity {
     }
 
     private void init2() {
-        txtv_test.setText("" + id);
+        txtv_test.setText("Phong: " + MainActivity.cur_room);
 
         mAuthState = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -262,7 +262,6 @@ public class TableActivity extends AppCompatActivity {
                     JSONObject ob = (JSONObject) args[0];
                     try {
                         boolean val = ob.getBoolean("val");
-                        txtv_test.setText(isReady + " " + val + " " + isEnough);
                         if (val && isReady && isEnough == 1) {
                             mSocket.emit("send_turn", 1, MainActivity.cur_room, -1, -1);
                             mSocket.emit("clientSend_playing", MainActivity.cur_room);
