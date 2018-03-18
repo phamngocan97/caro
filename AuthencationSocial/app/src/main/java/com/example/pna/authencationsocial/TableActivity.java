@@ -2,6 +2,7 @@ package com.example.pna.authencationsocial;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
@@ -111,7 +112,7 @@ public class TableActivity extends AppCompatActivity {
                 if (user == null) {
                     mSocket.emit("out_room", MainActivity.cur_room);
                     MainActivity.cur_room = "-1";
-                    Toast.makeText(TableActivity.this, MainActivity.cur_room, Toast.LENGTH_SHORT).show();
+                  //  Toast.makeText(TableActivity.this, MainActivity.cur_room, Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(TableActivity.this, MainActivity.class));
                 }
             }
@@ -318,5 +319,16 @@ public class TableActivity extends AppCompatActivity {
         }
     };
 
+    @Override
+    public void onBackPressed() {
+
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+
+    }
 
 }
