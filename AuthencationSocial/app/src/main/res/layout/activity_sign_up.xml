@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/custom_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -8,7 +9,11 @@
         android:text="Đăng ký"
         android:gravity="center"
         android:textSize="30sp"
-        android:textColor="#ff00"
+        android:textColor="#eeeaef"
+        android:background="@drawable/custom_trangtri"
+        android:layout_marginRight="40dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="30dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/txtvSignup"
@@ -29,8 +34,15 @@
             android:id="@+id/menu_signup_editEmail"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_marginTop="11dp"
             android:layout_weight="5"
+            android:background="@drawable/custom_edittext"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#181616"
+
             android:hint="Email"
             android:inputType="textEmailAddress" />
         <EditText
@@ -38,7 +50,13 @@
             android:inputType="textPassword"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_weight="5"
+            android:background="@drawable/custom_edittext"
+            android:gravity="center"
+            android:textColor="#181616"
             android:id="@+id/menu_signup_editPass"
             />
         <EditText
@@ -47,13 +65,19 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="5"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/custom_edittext"
+            android:gravity="center_vertical|center"
+            android:textColor="#181616"
+
             android:id="@+id/menu_signup_editRePass"
             />
     </LinearLayout>
 
     <LinearLayout
         android:layout_below="@id/menu_signup_linearEdit"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dp"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:weightSum="10"
@@ -64,9 +88,11 @@
             android:layout_width="0dp"
             android:layout_weight="5"
             android:layout_height="match_parent"
+            android:background="@drawable/custom_button"
             android:id="@+id/menu_signup_btnOk"
             />
         <Button
+            android:background="@drawable/custom_button"
             android:text="Cancel"
             android:layout_width="0dp"
             android:layout_weight="5"
