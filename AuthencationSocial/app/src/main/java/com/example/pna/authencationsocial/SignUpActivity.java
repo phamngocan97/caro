@@ -55,6 +55,7 @@ public class SignUpActivity extends AppCompatActivity {
                     });
 
                 } else {
+                    progressBar.setVisibility(View.GONE);
                     Toast.makeText(SignUpActivity.this, "Input empty or pass not equals", Toast.LENGTH_SHORT).show();
                 }
             }
