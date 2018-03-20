@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -57,7 +58,7 @@ public class ListRoomActivity extends AppCompatActivity {
         mSocket.on("serverSend_list_room",recieveListRoom);
     }
 
-    Emitter.Listener comeRoom = new Emitter.Listener() {
+    private Emitter.Listener comeRoom = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
             runOnUiThread(new Runnable() {
@@ -86,13 +87,14 @@ public class ListRoomActivity extends AppCompatActivity {
             });
         }
     };
-    Emitter.Listener recieveListRoom = new Emitter.Listener() {
+    private Emitter.Listener recieveListRoom = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     JSONObject ob = (JSONObject) args[0];
+                    Toast.makeText(ListRoomActivity.this,"getting list room",Toast.LENGTH_SHORT).show();
                     try {
                         JSONArray jsonArray = ob.getJSONArray("list");
 

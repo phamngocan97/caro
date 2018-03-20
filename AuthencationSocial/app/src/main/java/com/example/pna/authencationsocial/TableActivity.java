@@ -163,7 +163,7 @@ public class TableActivity extends AppCompatActivity {
         mSocket.on("serverSend_winner", getWinner);
     }
 
-    Emitter.Listener getWinner = new Emitter.Listener() {
+    private Emitter.Listener getWinner = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
             runOnUiThread(new Runnable() {
@@ -196,7 +196,7 @@ public class TableActivity extends AppCompatActivity {
         }
     };
 
-    Emitter.Listener getTurn = new Emitter.Listener() {
+    private Emitter.Listener getTurn = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
             runOnUiThread(new Runnable() {
@@ -234,7 +234,7 @@ public class TableActivity extends AppCompatActivity {
         }
     };
 
-    Emitter.Listener getEnough = new Emitter.Listener() {
+    private Emitter.Listener getEnough = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
             runOnUiThread(new Runnable() {
@@ -253,7 +253,7 @@ public class TableActivity extends AppCompatActivity {
 
         }
     };
-    Emitter.Listener getState = new Emitter.Listener() {
+    private Emitter.Listener getState = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
             runOnUiThread(new Runnable() {
@@ -275,7 +275,7 @@ public class TableActivity extends AppCompatActivity {
         }
     };
 
-    Emitter.Listener getPlaying = new Emitter.Listener() {
+    private Emitter.Listener getPlaying = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
             runOnUiThread(new Runnable() {
@@ -289,7 +289,7 @@ public class TableActivity extends AppCompatActivity {
             });
         }
     };
-    Emitter.Listener other_out = new Emitter.Listener() {
+    private Emitter.Listener other_out = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
             runOnUiThread(new Runnable() {
