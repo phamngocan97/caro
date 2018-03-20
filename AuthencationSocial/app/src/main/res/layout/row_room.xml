@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:weightSum="10"
+    android:background="@drawable/custom_listroom"
     >
     <LinearLayout
         android:layout_weight="8"

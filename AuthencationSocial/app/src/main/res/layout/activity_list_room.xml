@@ -10,12 +10,13 @@
     >
 
     <ImageButton
-        android:src="@android:drawable/ic_menu_add"
-        android:layout_width="wrap_content"
+        android:id="@+id/btnAddRoom"
+        android:layout_width="100dp"
         android:layout_height="0dp"
         android:layout_weight="2"
-        android:id="@+id/btnAddRoom"
-        />
+        android:background="@null"
+        android:scaleType="fitXY"
+        android:src="@drawable/add" />
 
     <ListView
         android:layout_weight="9"
