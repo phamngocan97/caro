@@ -1,35 +1,27 @@
 {
   "project_info": {
-    "project_number": "234077224862",
-    "firebase_url": "https://test-9e6ff.firebaseio.com",
-    "project_id": "test-9e6ff",
-    "storage_bucket": "test-9e6ff.appspot.com"
+    "project_number": "621658340507",
+    "firebase_url": "https://caro-f845e.firebaseio.com",
+    "project_id": "caro-f845e",
+    "storage_bucket": "caro-f845e.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:234077224862:android:55e5272315769aaf",
+        "mobilesdk_app_id": "1:621658340507:android:55e5272315769aaf",
         "android_client_info": {
           "package_name": "com.example.pna.authencationsocial"
         }
       },
       "oauth_client": [
         {
-          "client_id": "234077224862-d8nlm67trsvu4dcl1ufolcv9dp1kqad1.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.pna.authencationsocial",
-            "certificate_hash": "d8c8023a8c481de5884df2cf6cc5114c50e7053d"
-          }
-        },
-        {
-          "client_id": "234077224862-iko9o31k4qcfmlil6nf52al7vqf1qile.apps.googleusercontent.com",
+          "client_id": "621658340507-p3imsga1dg69vdc4rhlqnomfrk40qacf.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBu80uFMAPq36tNAlnd6J8dK0vbc1C3m-Y"
+          "current_key": "AIzaSyAflJVIfVjxgrZhZo32vzL-KRJu46fWieQ"
         }
       ],
       "services": {
@@ -37,13 +29,8 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "234077224862-iko9o31k4qcfmlil6nf52al7vqf1qile.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "status": 1,
+          "other_platform_oauth_client": []
         },
         "ads_service": {
           "status": 2
